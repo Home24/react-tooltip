@@ -71,6 +71,7 @@ class ReactTooltip extends Component {
       isCapture: props.isCapture || false
     }
     this.delayShowLoop = null
+    this.delayHideLoop = null
   }
 
   /* Bind this with method */
@@ -103,6 +104,7 @@ class ReactTooltip extends Component {
 
   componentWillUnmount () {
     clearTimeout(this.delayShowLoop)
+    clearTimeout(this.delayHideLoop)
     this.unbindListener()
     this.removeScrollListener()
     this.mount = false
@@ -268,14 +270,14 @@ class ReactTooltip extends Component {
     this.setState({
       placeholder: tooltipText,
       multilineCount: multilineCount,
-      place: e.currentTarget.getAttribute('data-place') ? e.currentTarget.getAttribute('data-place') : (this.props.place ? this.props.place : 'top'),
-      type: e.currentTarget.getAttribute('data-type') ? e.currentTarget.getAttribute('data-type') : (this.props.type ? this.props.type : 'dark'),
-      effect: e.currentTarget.getAttribute('data-effect') ? e.currentTarget.getAttribute('data-effect') : (this.props.effect ? this.props.effect : 'float'),
-      offset: e.currentTarget.getAttribute('data-offset') ? e.currentTarget.getAttribute('data-offset') : (this.props.offset ? this.props.offset : {}),
-      html: e.currentTarget.getAttribute('data-html') ? e.currentTarget.getAttribute('data-html') : (this.props.html ? this.props.html : false),
-      delayShow: e.currentTarget.getAttribute('data-delay-show') ? e.currentTarget.getAttribute('data-delay-show') : (this.props.delayShow ? this.props.delayShow : 0),
-      delayHide: e.currentTarget.getAttribute('data-delay-hide') ? e.currentTarget.getAttribute('data-delay-hide') : (this.props.delayHide ? this.props.delayHide : 0),
-      border: e.currentTarget.getAttribute('data-border') ? (e.currentTarget.getAttribute('data-border') === 'true') : (this.props.border ? this.props.border : false),
+      place: e.currentTarget.getAttribute('data-place') || this.props.place || 'top',
+      type: e.currentTarget.getAttribute('data-type') || this.props.type || 'dark',
+      effect: e.currentTarget.getAttribute('data-effect') || this.props.effect || 'float',
+      offset: e.currentTarget.getAttribute('data-offset') || this.props.offset || {},
+      html: e.currentTarget.getAttribute('data-html') === 'true' || this.props.html || false,
+      delayShow: e.currentTarget.getAttribute('data-delay-show') || this.props.delayShow || 0,
+      delayHide: e.currentTarget.getAttribute('data-delay-hide') || this.props.delayHide || 0,
+      border: e.currentTarget.getAttribute('data-border') === 'true' || this.props.border || false,
       extraClass,
       multiline
     })
@@ -319,7 +321,8 @@ class ReactTooltip extends Component {
   hideTooltip () {
     const {delayHide} = this.state
     clearTimeout(this.delayShowLoop)
-    setTimeout(() => {
+    clearTimeout(this.delayHideLoop)
+    this.delayHideLoop = setTimeout(() => {
       this.setState({
         show: false
       })
