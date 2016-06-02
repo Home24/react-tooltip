@@ -82,7 +82,7 @@ var ReactTooltip = function (_Component) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ReactTooltip).call(this, props));
 
-    _this._bind('showTooltip', 'updateTooltip', 'hideTooltip', 'checkStatus', 'onWindowResize', 'bindClickListener', 'globalHide', 'globalRebuild');
+    _this._bind('showTooltip', 'updateTooltip', 'preventGhostClick', 'hideTooltip', 'checkStatus', 'onWindowResize', 'bindClickListener', 'globalHide', 'globalRebuild');
     _this.mount = true;
     _this.state = {
       show: false,
@@ -180,8 +180,8 @@ var ReactTooltip = function (_Component) {
           targetArray[i].removeEventListener(dataEvent, this.checkStatus);
           targetArray[i].addEventListener(dataEvent, this.checkStatus, false);
         } else {
-          targetArray[i].removeEventListener('touchstart', this.showTooltip);
-          targetArray[i].addEventListener('touchstart', this.showTooltip, true);
+          targetArray[i].removeEventListener('touchstart', this.preventGhostClick);
+          targetArray[i].addEventListener('touchstart', this.preventGhostClick, true);
           targetArray[i].removeEventListener('mouseenter', this.showTooltip);
           targetArray[i].addEventListener('mouseenter', this.showTooltip, false);
 
@@ -206,7 +206,7 @@ var ReactTooltip = function (_Component) {
         if (dataEvent) {
           targetArray[i].removeEventListener(dataEvent, this.checkStatus);
         } else {
-          targetArray[i].removeEventListener('touchstart', this.hideTooltip);
+          targetArray[i].removeEventListener('touchstart', this.preventGhostClick);
           targetArray[i].removeEventListener('mouseenter', this.showTooltip);
           targetArray[i].removeEventListener('mousemove', this.updateTooltip);
           targetArray[i].removeEventListener('mouseleave', this.hideTooltip);
@@ -311,7 +311,15 @@ var ReactTooltip = function (_Component) {
       this.globalHide();
       window.removeEventListener('click', this.bindClickListener);
     }
-
+  }, {
+    key: 'preventGhostClick',
+    value: function preventGhostClick(e) {
+      if (this.state.event === null && e.type === 'touchstart') {
+        this.setState({
+          show: true
+        });
+      }
+    }
     /**
      * When mouse enter, show update
      */
